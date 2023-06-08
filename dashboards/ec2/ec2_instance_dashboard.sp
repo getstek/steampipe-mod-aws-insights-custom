@@ -231,8 +231,7 @@ query "ec2_instance_cost_mtd" {
     from
       aws_cost_by_service_monthly
     where
-      service = 'Amazon Elastic Compute Cloud - Compute'
-      and period_end > date_trunc('month', CURRENT_DATE::timestamp)
+      period_end > date_trunc('month', CURRENT_DATE::timestamp)
   EOQ
 }
 
@@ -305,7 +304,7 @@ query "ec2_instance_detailed_monitoring_enabled" {
 
 query "ec2_monthly_forecast_table" {
   sql = <<-EOQ
-    with monthly_costs as (
+with monthly_costs as (
       select
         period_start,
         period_end,
@@ -320,29 +319,24 @@ query "ec2_monthly_forecast_table" {
         date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval ) as days_in_month,
         sum(unblended_cost_amount) / (period_end::date - period_start::date ) * date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval )::numeric::money  as forecast_amount
       from
-        aws_cost_by_service_monthly as c
-
+        aws_cost_by_service_usage_type_monthly as c
       where
-        service = 'Amazon Elastic Compute Cloud - Compute'
-        and date_trunc('month', period_start) >= date_trunc('month', CURRENT_DATE::timestamp - interval '1 month')
-
-        group by
+        date_trunc('month', period_start) >= date_trunc('month', CURRENT_DATE::timestamp - interval '1 month')
+      group by
         period_start,
         period_end
     )
-
     select
       period_label as "Period",
       unblended_cost_amount as "Cost",
       average_daily_cost as "Daily Avg Cost"
     from
       monthly_costs
-
     union all
     select
       'This Month (Forecast)' as "Period",
       (select forecast_amount from monthly_costs where period_label = 'Month to Date') as "Cost",
-      (select average_daily_cost from monthly_costs where period_label = 'Month to Date') as "Daily Avg Cost"
+      (select average_daily_cost from monthly_costs where period_label = 'Month to Date') as "Daily Avg Cost";
 
   EOQ
 }
@@ -354,8 +348,6 @@ query "ec2_instance_cost_per_month" {
       sum(unblended_cost_amount)::numeric as "Unblended Cost"
     from
       aws_cost_by_service_usage_type_monthly
-    where
-      service = 'Amazon Elastic Compute Cloud - Compute'
     group by
       period_start
     order by
