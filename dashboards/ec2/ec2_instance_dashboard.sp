@@ -314,10 +314,10 @@ with monthly_costs as (
           else to_char (period_start, 'Month')
         end as period_label,
         period_end::date - period_start::date as days,
-        sum(unblended_cost_amount)::numeric::money as unblended_cost_amount,
+        sum(unblended_cost_amount)::numeric::money * 3.2 as unblended_cost_amount,
         (sum(unblended_cost_amount) / (period_end::date - period_start::date ) )::numeric::money as average_daily_cost,
         date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval ) as days_in_month,
-        sum(unblended_cost_amount) / (period_end::date - period_start::date ) * date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval )::numeric::money  as forecast_amount
+        sum(unblended_cost_amount)  / (period_end::date - period_start::date )  * date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval )::numeric::money * 4.1 as forecast_amount
       from
         aws_cost_by_service_usage_type_monthly as c
       where
