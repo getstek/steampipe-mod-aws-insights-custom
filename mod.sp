@@ -1,6 +1,6 @@
-mod "aws_insights" {
+mod "stc_insights" {
   # hub metadata
-  title         = "AWS Insights"
+  title         = "STC Insights"
   description   = "Create dashboards and reports for your AWS resources using Steampipe."
   color         = "#FF9900"
   documentation = file("./docs/index.md")
@@ -14,9 +14,9 @@ mod "aws_insights" {
   }
 
   require {
-    steampipe = "0.18.0"
+    steampipe = "0.20.5"
     plugin "aws" {
-      version = "0.91.0"
+      version = "0.106.0"
     }
   }
 }
