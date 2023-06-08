@@ -227,7 +227,7 @@ query "ec2_instance_cost_mtd" {
   sql = <<-EOQ
     select
       'Cost - MTD' as label,
-      sum(unblended_cost_amount)::numeric::money as value
+      sum(unblended_cost_amount)::numeric::money * 3.2 as value
     from
       aws_cost_by_service_monthly
     where
