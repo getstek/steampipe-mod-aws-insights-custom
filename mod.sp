@@ -14,9 +14,9 @@ mod "stc_insights" {
   }
 
   require {
-    steampipe = "0.20.5"
+    steampipe = "0.18.0"
     plugin "aws" {
-      version = "0.106.0"
+      version = "0.91.0"
     }
   }
 }
