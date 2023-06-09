@@ -315,7 +315,7 @@ with monthly_costs as (
         end as period_label,
         period_end::date - period_start::date as days,
         sum(unblended_cost_amount)::numeric::money * 3.2 as unblended_cost_amount,
-        (sum(unblended_cost_amount) / (period_end::date - period_start::date ) )::numeric::money as average_daily_cost,
+        (sum(unblended_cost_amount) * 3.2 / (period_end::date - period_start::date ) )::numeric::money as average_daily_cost,
         date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval ) as days_in_month,
         sum(unblended_cost_amount)  / (period_end::date - period_start::date )  * date_part('days', date_trunc ('month', period_start) + '1 MONTH'::interval  - '1 DAY'::interval )::numeric::money * 4.1 as forecast_amount
       from
@@ -328,15 +328,13 @@ with monthly_costs as (
     )
     select
       period_label as "Period",
-      unblended_cost_amount as "Cost",
-      average_daily_cost as "Daily Avg Cost"
+      unblended_cost_amount as "Cost"
     from
       monthly_costs
     union all
     select
       'This Month (Forecast)' as "Period",
-      (select forecast_amount from monthly_costs where period_label = 'Month to Date') as "Cost",
-      (select average_daily_cost from monthly_costs where period_label = 'Month to Date') as "Daily Avg Cost";
+      (select forecast_amount from monthly_costs where period_label = 'Month to Date') as "Cost";
 
   EOQ
 }
